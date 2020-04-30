@@ -1,0 +1,9 @@
+PHL 220 A 3 Wai Choi B
+CS 273 A 1 Paddy O'Brien F
+CS 273 A 1 Jean-Luc Picard B-
+CS 203 B 3 Paddy O'Brien C-
+CS 203 B 3 Jean-Luc Picard C
+PHL 220 A 3 Ada Lovelace A
+PHL 220 A 3 Grace Hopper C
+THE 105 A 3 Grace Hopper B+
+THE 105 A 3 Paddy O'Brien D+

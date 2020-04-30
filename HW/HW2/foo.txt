@@ -1,0 +1,6 @@
+                            NAME  GPA   #
+                       Choi, Wai  3.00  3
+                   Hopper, Grace  2.65  6
+                   Lovelace, Ada  4.00  3
+                  O'Brien, Paddy  1.29  7
+                Picard, Jean-Luc  2.18  4

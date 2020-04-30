@@ -1,0 +1,86 @@
+# A simple calculator program.
+# Respects order of operations.
+#
+# Author: Aaron Moss
+
+{%
+/*
+ * Copyright (c) 2013 Aaron Moss
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#include <cstdlib>
+%}
+
+expr : int = _ sum : psVal !.
+
+sum : int = prod : psVal (
+            PLUS prod : i { psVal += i; }
+            | MINUS prod : i { psVal -= i; } )*
+prod : int = elem : psVal (
+             TIMES elem : i { psVal *= i; }
+             | DIVIDE elem : i { psVal /= i; } )*
+elem : int = OPEN sum : psVal CLOSE
+             | num : psVal
+
+num : int = < [0-9]+ > : s { psVal = atoi(s.c_str()); } _
+
+PLUS = '+' _
+MINUS = '-' _
+TIMES = '*' _
+DIVIDE = '/' _
+OPEN = '(' _
+CLOSE = ')' _
+
+_ = (' ' | '\t')*
+
+{%
+#include <iostream>
+#include <sstream>
+
+/**
+ * Test harness for calculator grammar.
+ * @author Aaron Moss
+ */
+int main(int argc, char** argv) {
+	using namespace std;
+	
+	string s;
+	while ( getline(cin, s) ) {
+		stringstream ss(s);
+		parser::state ps(ss);
+		int x;
+		
+		if ( calc::expr(ps, x) ) {
+			cout << x << endl;
+		} else {
+			const parser::error& err = ps.error();
+			
+			cout << "SYNTAX ERROR @" << err.pos.col() << endl;
+			for (auto msg : err.messages) {
+				cout << "\t" << msg << endl;
+			}
+			for (auto exp : err.expected) {
+				cout << "\tExpected " << exp << endl;
+			}
+		}
+	}
+}
+%}

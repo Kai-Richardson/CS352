@@ -1,0 +1,93 @@
+{%
+#include "symtab.hpp"
+%}
+
+# Starter grammar file for HW 1 desk calculator.
+
+# reads a single expression
+assn : entry `assignment` =
+    name : n _ SET _ expr : e
+        { psVal = entry{n, e.ty, e.val}; }
+    | expr : e
+        { psVal = entry{"", e.ty, e.val}; }
+
+# reads a (relational) subexpression (boolean comparison or integer math)
+expr : entry `expression` =
+    eq_less : v
+        { psVal = entry{BOOL, v}; }
+    | add_sub : v
+        { psVal = entry{INT, v}; }
+
+# reads an atomic value (variable or integer)
+atom : entry `` =
+    name : n
+        {
+            check_not_equal( global_symtab[n].ty, ERR, "invalid variable " + n );
+            psVal = global_symtab[n];
+        }
+    | int_val : v
+        { psVal = entry{INT, v}; }
+
+
+# reads a variable name
+name : string `` =
+    !bool_val < [A-Za-z_]+ > : psVal _
+
+# reads an integer value
+### Error found: improper whitespace handling
+### Solution: Add a _ in the front
+int_val : int `integer value` =
+    _ < [0-9]+ > : s _ { psVal = stoi(s); }
+
+# reads a Boolean constant (true or false)
+bool_val : int `boolean value` =
+    _ < (TRUE | FALSE) >:s _ {
+        if (s.compare("true") == 0) {
+            psVal = 1;
+        }
+        else if (s.compare("false") == 0) {
+            psVal = 0;
+        }
+     }
+
+#equal to expressions for int/bool, then raw bools and < expressions
+eq_less : int `boolean value` = (
+    atom:a _ EQ _ atom:b                  {psVal = (a.val==b.val);}
+    | bool_val:c _ EQ _ bool_val:d          {psVal = (c==d);}
+    | bool_val : v                          { psVal = v; }
+    | int_val:x _ LESSTHAN _ int_val:y      {psVal = (x<y);}
+    )
+
+#addition or subtraction expression
+add_sub : int `integer value` = (
+    mult:psVal _ (PLUS _ mult:b      {psVal += b;})*
+    | mult:psVal _ (MINUS _ mult:b   {psVal -= b;})*
+)
+
+#multiplication expression
+mult : int `integer value` = (
+    expo:psVal _ (STAR _ expo:x { psVal *= x;})*
+)
+
+#exponent expression
+expo : int `integer value` = (
+    atom:a _ CARET _ atom:b    {psVal = pow(a.val,b.val);}
+    | atom:x {psVal = x.val;}
+)
+
+
+
+
+# tokens
+SET = @":=" _
+TRUE = "true"
+FALSE = "false"
+
+CARET = "^"
+EQ = "=="
+LESSTHAN = "<"
+STAR = "*"
+PLUS = "+"
+MINUS = "-"
+
+_ = [ \t\r\n]*

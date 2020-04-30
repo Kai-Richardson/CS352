@@ -1,0 +1,46 @@
+{%
+#include "parse_tree.hpp"
+%}
+
+
+IfStmt : parse_tree =
+	IF:a OPEN:b Expr:c CLOSE:d Stmt:e
+		{ psVal= parse_tree{"IfStmt", {a,b,c,d,e}}; }
+	(ELSE:f Stmt:g { psVal += f; psVal += g; })?
+
+Expr : parse_tree =
+	WORD:var ASSN:op Expr:e
+		{ psVal = parse_tree{"Expr", {var, op, e}}; }
+	| AddExpr : psVal
+
+AddExpr : parse_tree =
+	AtomExpr:psVal
+	(PLUS:op AtomExpr:b
+		{ psVal = parse_tree{"Expr", {op, b}}; }
+	)*
+	# AddExpr:a PLUS:op AtomExpr:b
+	# 	{ psVal = parse_tree{"Expr", {a, op, b}}; }
+	# | AtomExpr:psVal
+
+AtomExpr : parse_tree =
+	< [0-9]+ > : s _
+	{ psVal = parse_tree{"Expr", {parse_tree{"\"" + s + "\""}}}; }
+
+Stmt : parse_tree =
+	WORD : w
+	{ psVal = parse_tree{"Stmt", {w}}; }
+	(_ WORD:w { psVal += w; })*
+	_
+
+keyword = IF | ELSE
+
+WORD : parse_tree = ! keyword < [A-Za-z_]+ > : s _
+	{psVal = parse_tree{"\"" + s + "\""}; }
+ASSN : parse_tree = "=" _ {  psVal = parse_tree{"\"=\""}; }
+PLUS : parse_tree = "+" _ {  psVal = parse_tree{"\"+\""}; }
+IF : parse_tree = "if" _ {  psVal = parse_tree{"\"if\""}; }
+ELSE : parse_tree = "else" _ {  psVal = parse_tree{"\"else\""}; }
+OPEN : parse_tree = "(" _ {  psVal = parse_tree{"\"(\""}; }
+CLOSE : parse_tree = ")" _ {  psVal = parse_tree{"\")\""}; }
+
+_ = (' ' | '\t' | '\r' | '\n')*

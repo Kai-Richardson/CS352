@@ -1,0 +1,8 @@
+Phone = ( AreaCode? DDD '-' DDDD
+      | "+1" DDD DDD DDDD ) !.
+
+AreaCode = "(" DDD ") " | DDD '-'
+
+D = [0-9]
+DDD = D D D
+DDDD = D D D D

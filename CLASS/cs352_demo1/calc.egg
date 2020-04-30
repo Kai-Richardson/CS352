@@ -1,0 +1,49 @@
+{%
+//#include <stdio.h>
+%}
+
+expr : double = ( eql_neq: psVal ) !.
+
+eql_neq : double =
+	( add_sub: psVal | equals: psVal | doesnotequal: psVal ) !.
+
+add_sub :  double =
+	( mul_div: psVal | add: psVal | subtract: psVal ) !.
+
+mul_div : double =
+	( multiply: psVal | divide: psVal | num: psVal ) !.
+
+
+
+
+num : double =
+	< ( [0-9]+ ('.' [0-9]*)? | '.' [0-9]+ ) >: s _
+	{ psVal = std::stod(s); }
+
+multiply: double = (< num >:a MULT < (multiply | num) >:b) !.
+		{ psVal = std::stod(a)*std::stod(b); }
+
+divide: double = (< num >:a DIV < num >:b) !.
+		{ psVal = std::stod(a)/std::stod(b); }
+
+add: double = (< num >:a PLUS < num >:b) !.
+		{ psVal = std::stod(a)+std::stod(b); }
+
+subtract: double = ( < num >:a (MINU < num >:b { psVal = std::stod(a)-std::stod(b); })* ) !.
+
+
+equals: double = (< num >:a ISEQ < num >:b) !.
+		{ psVal = std::stod(a)==std::stod(b); }
+
+doesnotequal: double = (< num >:a NOEQ < num >:b) !.
+		{ psVal = std::stod(a)!=std::stod(b); }
+
+
+MULT = "*" _
+DIV  = "/" _
+PLUS = "+" _
+MINU = "-" _
+ISEQ = "==" _
+NOEQ = "!=" _
+
+_ = [ \t\r\n]*

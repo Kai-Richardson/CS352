@@ -1,0 +1,18 @@
+{%
+#include <stdio.h>
+%}
+
+IfStmt = IF OPEN Expr CLOSE 
+         { printf("["); } 
+         Stmt 
+         { printf("]"); } 
+         (ELSE { printf("["); } Stmt { printf("]"); } )?
+Expr = [0-9]+ _
+Stmt = ([A-Za-z_]+ _)+
+
+IF = "if" _
+ELSE = "else" _
+OPEN = "(" _
+CLOSE = ")" _
+
+_ = (' ' | '\t' | '\r' | '\n')*

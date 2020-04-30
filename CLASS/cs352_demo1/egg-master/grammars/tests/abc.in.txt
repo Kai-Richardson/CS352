@@ -1,0 +1,12 @@
+
+abc
+c
+ac
+aac
+aaac
+bbc
+bc
+x
+abcc
+abbc
+aabc

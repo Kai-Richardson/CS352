@@ -1,0 +1,11 @@
+`' DOESN'T MATCH  @0
+`abc' MATCHES
+`aabbcc' MATCHES
+`aaabbbccc' MATCHES
+`abbcc' DOESN'T MATCH  @2
+`aabcc' DOESN'T MATCH  @3
+`aabbc' DOESN'T MATCH  @5
+`x' DOESN'T MATCH  @0
+`abcc' DOESN'T MATCH  @2
+`abbc' DOESN'T MATCH  @2
+`aabc' DOESN'T MATCH  @3
